@@ -23,3 +23,7 @@ opentelemetry-exporter-otlp-proto-grpc==1.19.0
 opentelemetry-exporter-prometheus==1.12.0rc1
 # prometheus client
 prometheus-client==0.17.1
+# Ansible
+ansible==8.3.0
+requests==2.31.0
+google-auth==2.28.1
