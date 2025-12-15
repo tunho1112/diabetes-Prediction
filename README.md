@@ -11,6 +11,7 @@ This project aims to build a full MLOps pipeline for a machine learning predicti
   - [3. Cloud & IAC](#3-cloud)
   - [4. CI/CD](#4-cicd)
   - [5. Observable](#5-observable-system)
+  - [6. Datalake](#6-datalake)
 
 ## 🛠️ Prerequisite
 To get started with this project, please ensure you have the following installed:
@@ -304,3 +305,63 @@ AI Predict exposes log counts request via a metrics endpoint (`/predict`), Prome
 > For a demo video walkthrough, see: 
 > - `video_records/logs-kibana-elasticsearch.mkv`
 > - `video_records/jaeger_tracing.mov`
+
+## 6. Datalake
+### Start our data lake infrastructure
+```shell
+docker compose -f deployment/datalake/data-lake-with-mino.yaml up -d
+```
+### Generate data and push them to MinIO
+```shell
+conda create -n dl python=3.9
+conda activate dl
+pip install -r requirements.txt
+```
+Generate data and push to MinIO
+```shell
+# generata data
+python deployment/datalake/utils/dump_data.py
+# push data to minio 
+python deployment/datalake/utils/export_data_to_datalake_minio.py
+```
+After pushing the data to MinIO, access `MinIO` at 
+`http://localhost:9001/`, you should see your data already there.
+![minio](images/minio_datalake.png)
+### Create data schema
+After putting your files to `MinIO`, please execute `trino` container by the following command:
+```shell
+docker exec -ti datalake-trino bash
+```
+When you are already inside the `trino` container, typing `trino` to in an interactive mode
+After that, run the following command to register a new schema for our data:
+```sql
+---Create a new schema to store tables
+CREATE SCHEMA IF NOT EXISTS mle.diabetes_data
+WITH (location = 's3://diabetes-data/');
+
+---Create a new table in the newly created schema
+CREATE TABLE IF NOT EXISTS mle.diabetes_data.pump (
+    pregnancies INTEGER,
+    glucose INTEGER,
+    bloodpressure INTEGER,
+    skinthickness INTEGER,
+    insulin INTEGER,
+    bmi DOUBLE,
+    diabetespedigreefunction DOUBLE,
+    age INTEGER,
+    outcome INTEGER
+) WITH (
+  external_location = 's3://diabetes-data/pump',
+  format = 'PARQUET'
+);
+```
+### Query with DBeaver
+1. Install `DBeaver` as in the following [guide](https://dbeaver.io/download/)
+2. Connect to our database (type `trino`) using the following information (empty `password`):
+  ![DBeaver Trino](images/db_trino.png)
+3. Execute your queries on DBeaver
+```sql
+-- Create the pump tableSELECT * FROM mle.iot_time_series.pump 
+SELECT * FROM mle.diabetes_data.pump;
+```
+![db diabetes](images/trino_query_diabetes.png)
