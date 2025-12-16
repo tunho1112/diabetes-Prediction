@@ -13,6 +13,7 @@ This project aims to build a full MLOps pipeline for a machine learning predicti
   - [5. Observable](#5-observable-system)
   - [6. Datalake](#6-datalake)
   - [7. Batch Processing with Spark](#7.batch-processing)
+  - [8. Streaming Processing](#8.streaming-processing)
 
 ## 🛠️ Prerequisite
 To get started with this project, please ensure you have the following installed:
@@ -394,3 +395,14 @@ python deployment/batch-processing-with-spark/scripts/batch_processing.py
 ```
 You will show output: 
 ![batch-processing-spark](images/batch-processing-spark.png)
+## 8. Streaming Processing
+Deploy Streaming Processing with Kafka and Flink. 
+Run commnand to start: `docker compose up -f diabetes-Prediction/deployment/streaming-processing/docker-compose.yaml -d`
+You can check if Kafka producer is running normally by using
+```shell
+docker logs flink-kafka-producer
+```
+After that, get message from kafka and run flink for streaming processing, send output back to kafka with topic `sink_diabetes`. 
+Run command: `python diabetes-Prediction/deployment/streaming-processing/scripts/table_api.py`
+Check control-center in `localhost:9021` to view message
+![Flink streaming](images/streaming-processing.png)

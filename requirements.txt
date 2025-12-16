@@ -1,7 +1,7 @@
 fastapi==0.95.1
 locust==2.16.1
 loguru==0.7.0
-numpy==1.24.3
+numpy>=1.23
 pandas>=1.4.4
 pydantic==1.10.7
 pytest==7.4.0
@@ -35,9 +35,16 @@ PyYAML
 dotenv
 psycopg2-binary
 sqlalchemy
-
 # spark
 pyspark==3.3.2
 pydeequ==1.0.1
 python-dotenv==1.0.0
 nltk==3.8.1
+# Flink 
+apache-flink==1.17.1
+kafka-python==2.0.2
+avro-python3==1.8.1
+#pandas==1.3.0
+pyarrow==8.0.0
+python-schema-registry-client==2.4.1
+pymongo==3.8.0
