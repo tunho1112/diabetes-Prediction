@@ -366,6 +366,26 @@ CREATE TABLE IF NOT EXISTS mle.diabetes_data.pump (
 SELECT * FROM mle.diabetes_data.pump;
 ```
 ![db diabetes](images/trino_query_diabetes.png)
+### Run continuous cdc postgresql kafka
+```bash
+cd diabetes-Prediction/deployment/cdc-postgresql-kafka
+docker compose up -d
+```
+#### Register Connectior: 
+Connect Debezium with PostgreSQL to receive any updates from the database
+```bash
+bash streaming/run.sh register_connector configs/postgresql-cdc.json
+```
+You can check connector on web ui debezium ui `localhost:8085`
+![debezium ui](images/debesizum_connector.png)
+Run fake data: 
+```bash
+python streaming/utils/create_table.py
+python streaming/utils/insert_table.py
+```
+You can check log kafka on control-centre `localhost:9021`.
+![control-center](images/cdc-kafka.png)
+
 
 ## 7. Batch Processing
 Run batch processing with Spark and save data to datatwarehouse with format file .parquet.
