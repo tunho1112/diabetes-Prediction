@@ -12,8 +12,13 @@ This project aims to build a full MLOps pipeline for a machine learning predicti
   - [4. CI/CD](#4-cicd)
   - [5. Observable](#5-observable-system)
   - [6. Datalake](#6-datalake)
+<<<<<<< Updated upstream
   - [7. Batch Processing with Spark](#7.batch-processing)
   - [8. Streaming Processing](#8.streaming-processing)
+=======
+  - [7. Source System](#7-source-system)
+  - [8. Pipeline Orchestration](#8-pipeline-orchestration)
+>>>>>>> Stashed changes
 
 ## 🛠️ Prerequisite
 To get started with this project, please ensure you have the following installed:
@@ -367,6 +372,7 @@ CREATE TABLE IF NOT EXISTS mle.diabetes_data.pump (
 SELECT * FROM mle.diabetes_data.pump;
 ```
 ![db diabetes](images/trino_query_diabetes.png)
+<<<<<<< Updated upstream
 ### Run continuous cdc postgresql kafka
 ```bash
 cd diabetes-Prediction/deployment/cdc-postgresql-kafka
@@ -406,3 +412,40 @@ After that, get message from kafka and run flink for streaming processing, send 
 Run command: `python diabetes-Prediction/deployment/streaming-processing/scripts/table_api.py`
 Check control-center in `localhost:9021` to view message
 ![Flink streaming](images/streaming-processing.png)
+=======
+
+## 7. Source System 
+```shell
+docker compose -f deployment/cdc-postgresql-kafka/docker-compose.yml up -d
+```
+### Register connectors
+Connect Debezium with PostgreSQL to receive any updates from the database
+```shell
+cd deployment/cdc-postgresql-kafka
+bash streaming/run.sh register_connector configs/postgresql-cdc.json
+```
+### Initialize the database
+```shell
+# Create an empty table in PostgreSQL
+python streaming/utils/create_table.py
+# Periodically insert a new record to the table
+python streaming/utils/insert_table.py
+```
+## Observe new records on Kafka
+Access the `control center` at the address `http://localhost:9021/` to see the new records
+![control center](images/control-center.png)
+
+You can also verify whether your CDC connecter has been registered successfully in `control center`
+![cdc connector](images/cdc-connecter.png)
+
+## 8. Pipeline Orchestration
+Create pipeline orchstration with Airflow. Follow this step: 
+```bash 
+docker compose -f deployment/pipeline-orchestration up -d
+```
+Check all service are ready. Go to Airflow `localhost:8080`, Acc: `airflow/airflow`
+![Airflow Dashboard](images/airflow.png)
+Create a job to ingest data from the data lake (MinIO), perform transformation and feature engineering, and load it into the data warehouse (PostgreSQL). Check file `deployment/pipeline-orchestration/run_env/dags/transform_data.py`. 
+When job run successed, check output in database. 
+![Datawarehouse](images/datawarehouse_pg.png)
+>>>>>>> Stashed changes
