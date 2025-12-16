@@ -12,6 +12,7 @@ This project aims to build a full MLOps pipeline for a machine learning predicti
   - [4. CI/CD](#4-cicd)
   - [5. Observable](#5-observable-system)
   - [6. Datalake](#6-datalake)
+  - [7. Batch Processing with Spark](#7.batch-processing)
 
 ## 🛠️ Prerequisite
 To get started with this project, please ensure you have the following installed:
@@ -365,3 +366,11 @@ CREATE TABLE IF NOT EXISTS mle.diabetes_data.pump (
 SELECT * FROM mle.diabetes_data.pump;
 ```
 ![db diabetes](images/trino_query_diabetes.png)
+
+## 7. Batch Processing
+Run batch processing with Spark and save data to datatwarehouse with format file .parquet.
+```bash
+python deployment/batch-processing-with-spark/scripts/batch_processing.py
+```
+You will show output: 
+![batch-processing-spark](images/batch-processing-spark.png)
