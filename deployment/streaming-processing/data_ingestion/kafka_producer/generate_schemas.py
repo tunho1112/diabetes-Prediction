@@ -19,6 +19,7 @@ def main(args):
     schema = {
         "doc": "Diabetes schema to help you get started.",
         "fields": [
+            {"name": "diabete_id", "type": "string"},
             {"name": "created", "type": "string"},
             {"name": "Pregnancies", "type": "int"},
             {"name": "Glucose", "type": "int"},

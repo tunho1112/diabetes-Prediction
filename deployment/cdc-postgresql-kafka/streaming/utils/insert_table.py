@@ -28,6 +28,7 @@ def main():
 
     # Loop over all columns and create random values
     for _ in range(NUM_ROWS):
+        diabete_id = random.randint(0, 100)
         pregnancies = random.randint(0, 15)
         glucose = random.randint(70, 200)
         bloodpressure = random.randint(40, 120)
@@ -38,6 +39,7 @@ def main():
         age = random.randint(18, 80)
         query = f"""
             INSERT INTO {TABLE_NAME} (
+                diabete_id,
                 pregnancies,
                 glucose,
                 bloodpressure,
@@ -48,6 +50,7 @@ def main():
                 age
             )
             VALUES (
+                {diabete_id},
                 {pregnancies},
                 {glucose},
                 {bloodpressure},

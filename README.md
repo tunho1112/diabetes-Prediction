@@ -1,7 +1,7 @@
 # 🚀 Builde MLOPs for Prediction ML System
 This project aims to build a full MLOps pipeline for a machine learning prediction system, focusing on diabetes prediction. It covers the steps from data processing, model training, evaluation, and deployment, to automating workflows with best practices. The goal is to demonstrate a robust, reproducible, and scalable approach to operationalizing ML models in production environments.
 
-![](images/overview_architecture.png)
+![](images/overview_architecture_v2.png)
 
 ## 📑 Table of Contents
 - [📊 Dataset](#-dataset)
@@ -12,13 +12,10 @@ This project aims to build a full MLOps pipeline for a machine learning predicti
   - [4. CI/CD](#4-cicd)
   - [5. Observable](#5-observable-system)
   - [6. Datalake](#6-datalake)
-<<<<<<< Updated upstream
-  - [7. Batch Processing with Spark](#7.batch-processing)
-  - [8. Streaming Processing](#8.streaming-processing)
-=======
   - [7. Source System](#7-source-system)
-  - [8. Pipeline Orchestration](#8-pipeline-orchestration)
->>>>>>> Stashed changes
+  - [8. Streaming Precessing](#8-streaming-processing)
+  - [9. Pipeline Orchestration](#9-pipeline-orchestration)
+  - [10. Kserve](#10-kserve)
 
 ## 🛠️ Prerequisite
 To get started with this project, please ensure you have the following installed:
@@ -372,10 +369,9 @@ CREATE TABLE IF NOT EXISTS mle.diabetes_data.pump (
 SELECT * FROM mle.diabetes_data.pump;
 ```
 ![db diabetes](images/trino_query_diabetes.png)
-<<<<<<< Updated upstream
 ### Run continuous cdc postgresql kafka
 ```bash
-cd diabetes-Prediction/deployment/cdc-postgresql-kafka
+cd deployment/cdc-postgresql-kafka
 docker compose up -d
 ```
 #### Register Connectior: 
@@ -412,11 +408,10 @@ After that, get message from kafka and run flink for streaming processing, send 
 Run command: `python diabetes-Prediction/deployment/streaming-processing/scripts/table_api.py`
 Check control-center in `localhost:9021` to view message
 ![Flink streaming](images/streaming-processing.png)
-=======
 
-## 7. Source System 
+## 7. Streaming Processing 
 ```shell
-docker compose -f deployment/cdc-postgresql-kafka/docker-compose.yml up -d
+docker compose -f deployment/streaming-processing/docker-compose.yaml up -d
 ```
 ### Register connectors
 Connect Debezium with PostgreSQL to receive any updates from the database
@@ -448,4 +443,42 @@ Check all service are ready. Go to Airflow `localhost:8080`, Acc: `airflow/airfl
 Create a job to ingest data from the data lake (MinIO), perform transformation and feature engineering, and load it into the data warehouse (PostgreSQL). Check file `deployment/pipeline-orchestration/run_env/dags/transform_data.py`. 
 When job run successed, check output in database. 
 ![Datawarehouse](images/datawarehouse_pg.png)
->>>>>>> Stashed changes
+
+## 9. Feature Store
+#### Run service docker
+Init feature store: 
+```bash
+cd deployment/feature-store
+# for first init if not exist
+feast init diabetes_feature
+```
+
+## 10. Kserve
+### Prerequisite
+Run mlflow service: `docker compose -f deployment/deploy-mlflow up -d`
+#### Serving with model onnx and triton inferenc serve
+```bash
+# training model 
+python src/train.py
+python src/model2onnx.py
+docker run --rm --name triton-serving -p 8000:8000 -p 8001:8001 -p 8002:8002 \
+    -v /home/tu/Desktop/PERSONAL/COURSES/MLE/Homeworks/diabetes-Prediction/models/triton-models:/models \
+    nvcr.io/nvidia/tritonserver:23.12-py3 tritonserver --model-repository=/models
+```
+#### Serving model with kserve 
+```bash
+python src/kserve_predict_onnx.py
+```
+Model with serving `localhost:8000`
+Test with curl:
+```bash
+curl -X POST -H "Content-Type: application/json"   -d '{
+        "input_data": [
+            [6,103,66,0,0,24.3,0.249,29],
+            [3,89,74,16,85,30.4,0.551,38]
+        ]
+      }'   http://localhost:8080/v1/models/diabetest-model:predict
+
+### Response
+Output: [[0,0],[[0.99314135,0.006858647],[0.9728105,0.027189493]]]                                                         `
+```

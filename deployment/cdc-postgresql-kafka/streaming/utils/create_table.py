@@ -16,6 +16,8 @@ def main():
     # Create devices table
     create_table_query = """
         CREATE TABLE IF NOT EXISTS diabetes (
+        created TIMESTAMPTZ DEFAULT NOW(),
+        diabete_id INTEGER,
         pregnancies INTEGER,
         glucose INTEGER,
         bloodpressure INTEGER,

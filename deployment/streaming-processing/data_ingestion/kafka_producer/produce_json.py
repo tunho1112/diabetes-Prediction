@@ -66,6 +66,7 @@ def create_streams(servers, schemas_path):
 
     while True:
         data = {
+            "diabete_id": random.randint(1, 200),
             "created": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "pregnancies": random.randint(0, 15),
             "glucose": random.randint(70, 200),
